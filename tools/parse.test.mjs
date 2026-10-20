@@ -318,7 +318,7 @@ test('kindOf files built-ins, fixtures, mirrors and catalogue copies, and counts
   assert.equal(kindOf('cat/templates', 'components/mods/games/tetris', { name: 'tetris' }, catalogs), 'catalog')
   assert.equal(kindOf('cat/templates', 'tests/fixtures/x', { name: 'x' }, catalogs), 'fixture')
   assert.equal(kindOf('a/b', 'plugins/x', { name: 'x' }, catalogs), 'mod')
-  assert.deepEqual([...readCatalogs('data/catalogs.txt')], ['davila7/claude-code-templates', 'DrishtantKaushal/AwesomeClaudeCodeMods'])
+  assert.deepEqual([...readCatalogs('data/catalogs.txt')], ['Dandeppert/Claude-mods', 'davila7/claude-code-templates', 'DrishtantKaushal/AwesomeClaudeCodeMods'])
   assert.deepEqual([...readCatalogs('data/no-such-file.txt')], [])
   const after = clone()
   after.mods.push({ ...clone().mods[0], id: 'cat/templates:mods/x', repo: 'cat/templates', kind: 'catalog' })
@@ -396,6 +396,19 @@ test('Ostrakon development plugins stay out without excluding its installable pl
   const exceptions = new Set([`${repo}:tools/gallery`])
   assert.equal(kindOf(repo, 'tools/gallery', {}, new Set(), exceptions), 'mod')
   assert.equal(kindOf(repo, 'tools/gallery', { description: 'A test fixture.' }, new Set(), exceptions), 'fixture')
+})
+
+test('the dispatch replay harness does not count as a shipped mod', () => {
+  const repo = 'cdeust/claude-mods'
+  assert.equal(kindOf(repo, 'scripts/replay-dispatch', {}), 'fixture')
+  assert.equal(kindOf(repo, 'scripts/replay-dispatch/probe', {}), 'fixture')
+  assert.equal(kindOf('Cdeust/Claude-Mods', 'scripts/replay-dispatch', {}), 'fixture')
+  for (const path of ['scripts/replay-dispatcher', 'mods/zetetic-autopilot', 'mods/replay-dispatch']) {
+    assert.equal(kindOf(repo, path, {}), 'mod', path)
+  }
+  assert.equal(kindOf('another/claude-mods', 'scripts/replay-dispatch', {}), 'mod')
+  const exceptions = new Set([`${repo}:scripts/replay-dispatch`])
+  assert.equal(kindOf(repo, 'scripts/replay-dispatch', {}, new Set(), exceptions), 'mod')
 })
 
 test('benchmark fixtures stay out without excluding usable evaluation mods', () => {
